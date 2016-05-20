@@ -37,7 +37,19 @@ TYPE createTask (int priority, char *desc)
 */
 void saveList(DynArr *heap, FILE *filePtr)
 {
-  	/* FIX ME */
+  /* Assert pre-condtion */
+  assert(heap->size != 0);
+
+  int i;
+  for(i = 0; i < heap->size - 1; i++) {
+  	printf("saving a line\n");
+  	fprintf(filePtr, "%d\t%s\n", 
+  		heap->data[i].priority, heap->data[i].description);
+  }
+
+  /* Avoids newline on EOF */
+  fprintf(filePtr, "%d\t%s", 
+  	heap->data[i].priority, heap->data[i].description);
 }
 
 /*  Load the list from a file
@@ -50,7 +62,23 @@ void saveList(DynArr *heap, FILE *filePtr)
 */
 void loadList(DynArr *heap, FILE *filePtr)
 {
-  	/* FIX ME */
+  int pri = 0;
+  char taskDesc[TASK_DESC_SIZE], *endPtr;
+  TYPE task;
+
+  while(!feof (filePtr)) {
+  	fscanf(filePtr, "%d", &pri);
+  	fgets(taskDesc, TASK_DESC_SIZE, (FILE *) filePtr);
+
+ 		/* Remove tab character */
+  	memmove(&taskDesc[0], &taskDesc[1], strlen(taskDesc));
+  	endPtr = strchr(taskDesc, '\n');
+  	if (endPtr)
+  		*endPtr = '\0';
+
+  	task = createTask(pri, taskDesc);
+  	addHeap(heap, task);
+  }
 }
 
 /*  Print the list
@@ -62,7 +90,27 @@ void loadList(DynArr *heap, FILE *filePtr)
 */
 void printList(DynArr *heap)
 {
-  	/* FIX ME  */
+  /* Assert the pre-condition */
+  assert(heap->size != 0);
+
+  DynArr *tempArr;
+  TYPE heapNode;
+
+  /* Create temporary dynamic array while we print */
+  tempArr = newDynArr(heap->capacity);
+  copyDynArr(heap, tempArr);
+
+  while(heap->size != 0) {
+  	sortHeap(heap);
+  	heapNode = getMinHeap(heap);
+  	printf("TASK: %s\nPRIORITY: %d\n\n", 
+  		heapNode.description, heapNode.priority);
+  	removeMinHeap(heap);
+  }
+
+  /* Copy back heap and delete the temp */
+  copyDynArr(tempArr, heap);
+  deleteDynArr(tempArr);
 }
 
 /*  Compare two tasks by priority

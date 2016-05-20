@@ -8,5 +8,5 @@ Git repository for all my homework completed for this course.  Contains skeleton
 - [x] Homework 3  **(95/100)**
 - [x] Homework 4  **(100/100)**
 - [x] Homework 5
-- [ ] Homework 6
+- [x] Homework 6
 - [ ] Bonus Homework

@@ -1,0 +1,17 @@
+/* My program save output*/
+2	eat food
+10	study
+11	get drunk
+999	SLEEP
+/* My program printList output */
+TASK: SLEEP
+PRIORITY: 999
+
+TASK: get drunk
+PRIORITY: 11
+
+TASK: study
+PRIORITY: 10
+
+TASK: eat food
+PRIORITY: 2

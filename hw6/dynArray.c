@@ -263,9 +263,7 @@ int _smallerIndexHeap(DynArr *heap, int i, int j)
 */
 TYPE getMinHeap(DynArr *heap)
 {
-  	TYPE temp;
-  	temp = heap->data[heap->size -1];
-  	return temp;
+  return heap->data[0];
 }
 
 /*	Add a node to the heap
@@ -284,11 +282,9 @@ void addHeap(DynArr *heap, TYPE node)
   int nodePos = heap->size;
   int nodeParent = ((nodePos - 1) / 2);
   addDynArr(heap, node);
-  printf("added\n");
 
   /* Fix heap by percolating up */
-  while(nodePos > 0 && node.priority < heap->data[nodeParent].priority) {
-  	printf("swapping %d and %d\n", nodePos, nodeParent);
+  while(nodePos > 0 && compare(node, heap->data[nodeParent]) == -1) {
   	swapDynArr(heap, nodePos, nodeParent);
   	nodePos = nodeParent;
   	nodeParent = ((nodePos - 1) / 2);
@@ -305,7 +301,24 @@ void addHeap(DynArr *heap, TYPE node)
 */
 void _adjustHeap(DynArr *heap, int max, int pos)
 {
-  	/* FIXME */
+  int leftChild = (pos * 2) + 1;
+  int rightChild = (pos * 2) + 2;
+
+  if(rightChild < max) {
+  	int temp = _smallerIndexHeap(heap, leftChild, rightChild);
+  	if(compare(heap->data[temp], heap->data[pos]) == -1) {
+  		swapDynArr(heap, temp, pos);
+  		_adjustHeap(heap, max, temp);
+  	}
+  }
+
+
+  else if(leftChild < max) {
+  	if(compare(heap->data[leftChild], heap->data[pos]) == -1) {
+  		swapDynArr(heap, leftChild, pos);
+  		_adjustHeap(heap, max, leftChild);
+  	}
+  }
 }
 
 /*	Remove the first node, which has the min priority, from the heap
@@ -327,6 +340,9 @@ void removeMinHeap(DynArr *heap)
   heap->size--;
 
   /* Percolate down */
+  _adjustHeap(heap, heap->size, 0);
+
+
 }
 
 
@@ -343,7 +359,7 @@ void _buildHeap(DynArr *heap)
 	assert(heap->size != 0);
 
 	/* Adjust entire heap to maintain heap property */
-	_adjustHeap(heap, heap->size, 0);
+	_adjustHeap(heap, heap->size - 1, 0);
 	
 }
 /* 
@@ -356,5 +372,18 @@ void _buildHeap(DynArr *heap)
 
 void sortHeap(DynArr *heap)
 {
-	/*FIXME*/
+	/* Assert pre-condition */
+	assert(heap->size != 0);
+
+	_buildHeap(heap);
+
+	/* Reverse order of heap by swapping elements equidistant from center */
+	int i;
+	for(i = heap->size - 1; i > 0; i--)
+	{
+		swapDynArr(heap, 0, i);
+		_adjustHeap(heap, i, 0);
+	}
+	/*for(i = 0; i <= heap->size / 2; i++)
+		swapDynArr(heap, heap->size - 1 - i, i);*/
 }
