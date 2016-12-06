@@ -75,14 +75,24 @@ int bf(struct AVLnode * current)
 /* left-rotate subtree of current node */
 struct AVLnode * rotateLeft(struct AVLnode * current)
 {
-	/* write this function */ 
+	struct AVLnode *tmp = current->right;
+	current->right = tmp->left;
+	tmp->left = current;
+	setHeight(current);
+	setHeight(tmp);
+	return tmp;
 
 }
 
 /* right-rotate subtree of current node */
 struct AVLnode * rotateRight(struct AVLnode * current)
 {
-	/* write this function */ 
+	struct AVLnode *tmp = current->left;
+	current->left = tmp->right;
+	tmp->right = current;
+	setHeight(current);
+	setHeight(tmp);
+	return tmp;
 
 }
 
@@ -90,12 +100,22 @@ struct AVLnode * rotateRight(struct AVLnode * current)
 struct AVLnode * _balance(struct AVLnode * current)
 {
 	int cbf = bf(current);
+	if(cbf < -1) {
 
-	/* write this function */ 
+		if(bf(current->left) > 0)
+			current->left = rotateLeft(current->left);
+		return rotateRight(current);
+	}
 
-	
-	
-	
+	else if(cbf > 1) {
+
+		if(bf(current->right) < 0)
+			current->right = rotateRight(current->right);
+
+		return rotateLeft(current);
+	}
+
+	setHeight(current);
 	return current;
 }
 
@@ -104,11 +124,21 @@ struct AVLnode * AVLnodeAdd(struct	AVLnode * current, TYPE newValue)
 {
 	struct AVLnode * newnode;
 
-	/* write this function */ 
-	
-	
-	
-	
+	if(current == 0) {
+		newnode = (struct AVLnode *) malloc(sizeof(struct AVLnode));
+		assert(newnode != NULL);
+
+		newnode->left = 0;
+		newnode->right = 0;
+		newnode->val = newValue;
+		return newnode;
+	}
+
+	else if(LT(newValue, current->val))
+		current->left = AVLnodeAdd(current->left, newValue);
+	else
+		current->right = AVLnodeAdd(current->right, newValue);
+
 	return _balance(current);
 }
 
@@ -124,9 +154,15 @@ int containsAVLTree(struct AVLTree *tree, TYPE val)
 {
 	struct AVLnode* cur = tree->root;
 
-	/* write this function */ 
-
-
+	while(cur != 0) {
+		if(EQ(cur->val, val))
+			return 1;
+		else if(LT(val, cur->val))
+			cur = cur->left;
+		else
+			cur = cur->right;
+	}
+	return 0;
 }
 
 /* find leftmost value from subtree of current node */
